@@ -1,0 +1,53 @@
+<div class="header-wrapper">
+  <a href="https://www.humanislets.com/">
+    <div class="logo">
+      <img src="assets/humanislets_logo.png" alt="logo">
+    </div>
+  </a>
+
+  <a href="https://www.humanislets.com/" class="home-link">
+    Home
+  </a>
+
+  <a nz-dropdown [nzDropdownMenu]="menu1" 
+  href="https://www.humanislets.com/#/omics" class="nav-link">
+    Omics
+  </a>
+  <nz-dropdown-menu #menu1="nzDropdownMenu">
+    <ul nz-menu nzSelectable>
+      <li nz-menu-item>Section 1</li>
+      <li nz-menu-item>Section 2</li>
+      <li nz-menu-item>Section 3</li>
+    </ul>
+  </nz-dropdown-menu>
+
+  <a href="https://www.humanislets.com/#/donor" class="nav-link">Donor</a>
+  <a href="https://www.humanislets.com/#/feature" class="nav-link">Feature</a>
+  <a href="https://www.humanislets.com/#/download" class="nav-link">Download</a>
+
+  <div class="search-container">
+    <nz-input-group [nzSuffix]="suffixIconSearch">
+      <input 
+        type="text" 
+        nz-input 
+        placeholder="Search..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        (keyup.enter)="onSearch()"
+        class="search-input">
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
+      <div class="search-suffix">
+        <nz-icon 
+          nzType="search" 
+          (click)="onSearch()">
+        </nz-icon>
+        <nz-icon 
+          *ngIf="searchTerm"
+          nzType="close-circle" 
+          (click)="clearSearch()">
+        </nz-icon>
+      </div>
+    </ng-template>
+  </div>
+</div>

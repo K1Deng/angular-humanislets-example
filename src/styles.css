@@ -1,0 +1,23 @@
+@import 'ng-zorro-antd/ng-zorro-antd.min.css';
+
+.ant-dropdown {
+  z-index: 9999 !important;
+}
+
+.cdk-overlay-container {
+  z-index: 9999 !important;
+}
+
+.cdk-overlay-backdrop {
+  z-index: 9998 !important;
+}
+
+.ant-layout-header {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.ant-layout-content {
+  position: relative !important;
+  z-index: 1 !important;
+}

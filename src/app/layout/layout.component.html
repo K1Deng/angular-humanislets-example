@@ -1,0 +1,280 @@
+<nz-layout>
+
+  <nz-header>
+     <app-header></app-header>
+  </nz-header>
+
+  <nz-content>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a href="https://www.humanislets.com/">
+          <nz-icon nzType="home" />
+        </a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a href="https://www.humanislets.com/#/omics">
+          <span>Omics</span>
+        </a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>Subsection 1</nz-breadcrumb-item>
+    </nz-breadcrumb>
+
+    <nz-page-header class="page-header">
+      <nz-page-header-title>Omics View</nz-page-header-title>
+      <nz-page-header-content>
+        <div nz-row>
+          <div class="content">
+            <p nz-paragraph>
+              This tool uses general linear models to find associations between omics features and donor metadata/outcomes using the limma R package. A linear model is fit to each omics feature that includes the primary metadata and covariate variables. Then, results are extracted from the model for the primary metadata. See the <a class= "docs-link" href="https://xia-lab.github.io/HumanIsletsDoc/overview-of-statistical-analysis-methods.html#multiple-linear-regression" target="_blank" >statistical analysis documentation</a> for more details.
+            </p>
+          </div>
+        </div>
+      </nz-page-header-content>
+    </nz-page-header>
+
+    <div class="select-group">
+      <label class="select-label">Omics Type:</label>
+      <nz-select
+        nzShowSearch
+        nzAllowClear
+        [(ngModel)]="selectedOmicsType"
+      >
+        <nz-option nzLabel="Bulk gene expression (RNA-seq)" nzValue="rna-seq"></nz-option>
+        <nz-option nzLabel="Bulk gene expression (Nanostring)" nzValue="nanostring"></nz-option>
+        <nz-option nzLabel="Bulk protein expression" nzValue="protein"></nz-option>
+        <nz-option nzLabel="Pseudobulk gene expression" nzValue="pseudobulk"></nz-option>
+        <nz-option nzLabel="Single-cell gene expression" nzValue="single-cell"></nz-option>
+      </nz-select>
+    </div>
+
+    <div class="select-group">
+      <label class="select-label">Primary Metadata:</label>
+      <nz-select
+        nzShowSearch
+        nzAllowClear
+        [(ngModel)]="selectedPrimaryType"
+      >
+        <nz-option nzLabel="Donor Characteristics" nzValue="donor"></nz-option>
+        <nz-option nzLabel="Organ Characteristics and Processing" nzValue="organ"></nz-option>
+        <nz-option nzLabel="Isolation Outcomes" nzValue="isolation"></nz-option>
+      </nz-select>
+
+      <nz-select
+        nzShowSearch
+        nzAllowClear
+        [(ngModel)]="selectedDetailType"
+      >
+        <nz-option nzLabel="Age" nzValue="age"></nz-option>
+        <nz-option nzLabel="Sex" nzValue="sex"></nz-option>
+        <nz-option nzLabel="BMI" nzValue="bmi"></nz-option>
+        <nz-option nzLabel="Donation Type" nzValue="donation"></nz-option>
+        <nz-option nzLabel="HbA1c (%)" nzValue="hba1c"></nz-option>
+        <nz-option nzLabel="HLA A2" nzValue="hlaa2"></nz-option>
+        <nz-option nzLabel="Diabetes Diagnosis" nzValue="diagnosis"></nz-option>
+        <nz-option nzLabel="Corrected Diabetes Status" nzValue="status"></nz-option>
+      </nz-select>
+    </div>
+
+    <div class="select-group">
+      <label class="select-label">Comparison of Interest:</label>
+      <nz-select
+        nzShowSearch
+        nzAllowClear
+        [(ngModel)]="selectedGroupA"
+      >
+        <nz-option nzLabel="No Diabetes" nzValue="no-diabetes"></nz-option>
+        <nz-option nzLabel="Type 1 Diabetes" nzValue="type-one"></nz-option>
+        <nz-option nzLabel="Type 2 Diabetes" nzValue="type-two"></nz-option>
+      </nz-select>
+
+      <span class="vs-text">vs.</span>
+
+      <nz-select
+        nzShowSearch
+        nzAllowClear
+        [(ngModel)]="selectedGroupB"
+      >
+        <nz-option nzLabel="No Diabetes" nzValue="no-diabetes"></nz-option>
+        <nz-option nzLabel="Type 1 Diabetes" nzValue="type-one"></nz-option>
+        <nz-option nzLabel="Type 2 Diabetes" nzValue="type-two"></nz-option>
+      </nz-select>
+    </div>
+
+    <div class="select-group">
+      <label class="select-label">Control for:</label>
+      <nz-select nzMode="tags" [(ngModel)]="listOfTagOptions">
+        <nz-option-group nzLabel="Donor Characteristics">
+          @for (option of listOfDonorOption; track option) {
+            <nz-option [nzLabel]="option" [nzValue]="option"></nz-option>
+          }
+        </nz-option-group>
+        <nz-option-group nzLabel="Organ Characteristics and Processing">
+          @for (option of listOfOrganOption; track option) {
+            <nz-option [nzLabel]="option" [nzValue]="option"></nz-option>
+          }>
+        </nz-option-group>
+      </nz-select>
+    </div>
+    
+    <div class="radio-group">
+      <label class="radio-group-title">Donors:</label>
+      <nz-radio-group [(ngModel)]="donorSelection" (ngModelChange)="onDonorSelectionChange()">
+        <label nz-radio nzValue="all">All</label>
+        <label nz-radio nzValue="subset">Subset</label>
+      </nz-radio-group>
+    </div>
+
+    <div *ngIf="donorSelection === 'subset'" class="subset-options">
+      <h3>Select Donors</h3>
+      <nz-tabset class="custom-tabs">
+        <nz-tab nzTitle="Applied Filters">
+          <nz-tabset class="nested-tabset">
+            <nz-tab nzTitle="Donor Characteristics">
+              <p nz-paragraph>
+              If enabled, variable filters will exclude donors with missing values for that variable.
+              Show advanced filters. <!-- Advanced search -->
+              </p>
+              <div class="tab-content">
+                <div class="filter-section">
+                  <div class="filter-item">
+                    <span class="filter-label">Sex:</span>
+                    <nz-checkbox-group [(ngModel)]="selectedSexOptions" class="checkbox-group">
+                      <label nz-checkbox nzValue="male">Male</label>
+                      <label nz-checkbox nzValue="female">Female</label>
+                    </nz-checkbox-group>
+                  </div>
+                  
+                  <div class="filter-item">
+                    <span class="filter-label">Diabetes:</span>
+                    <nz-checkbox-group [(ngModel)]="selectedDiabetesOptions" class="checkbox-group">
+                      <label nz-checkbox nzValue="no_diabetes">No Diabetes</label>
+                      <label nz-checkbox nzValue="type1">Type 1</label>
+                      <label nz-checkbox nzValue="type2">Type 2</label>
+                    </nz-checkbox-group>
+                  </div>
+                  
+                  <div class="filter-item">
+                    <span class="filter-label">Age ({{ageRange[0]}}-{{ageRange[1]}}):</span>
+                    <div class="slider-container">
+                      <nz-slider 
+                        [(ngModel)]="ageRange" 
+                        [nzMin]="0" 
+                        [nzMax]="100" 
+                        [nzRange]="true" 
+                        [nzDefaultValue]="[20, 80]">
+                      </nz-slider>
+                    </div>
+                  </div>
+                  
+                  <div class="filter-item">
+                    <span class="filter-label">BMI ({{bmiRange[0]}}-{{bmiRange[1]}}):</span>
+                    <div class="slider-container">
+                      <nz-slider 
+                        [(ngModel)]="bmiRange" 
+                        [nzMin]="15" 
+                        [nzMax]="50" 
+                        [nzRange]="true" 
+                        [nzDefaultValue]="[20, 45]">
+                      </nz-slider>
+                    </div>
+                  </div>
+                  
+                  <div class="filter-item">
+                    <span class="filter-label">HbA1c ({{hba1cRange[0]}}-{{hba1cRange[1]}}):</span>
+                    <div class="slider-container">
+                      <nz-slider 
+                        [(ngModel)]="hba1cRange" 
+                        [nzMin]="3" 
+                        [nzMax]="15" 
+                        [nzRange]="true" 
+                        [nzStep]="0.1"
+                        [nzDefaultValue]="[4, 6]">
+                      </nz-slider>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </nz-tab>
+            
+            <nz-tab nzTitle="Data Availability">
+              <p class="tab-intro">
+                All donors have basic clinical metadata and isolation information available. To filter based on availability of other data types, please use the form below. Only donors with ALL of the selected data types will be included.
+              </p>
+              <div class="tab-content">
+                <label class="select-label">Select datasets:</label>
+                <nz-select
+                  nzShowSearch
+                  [(ngModel)]="selectedAvailabilityType"
+                  class="dataset-select">
+                  <nz-option nzLabel="GSIS" nzValue="gsis"></nz-option>
+                  <nz-option nzLabel="Glucose Perifusions" nzValue="glucose"></nz-option>
+                  <nz-option nzLabel="Leucine Perifusions" nzValue="leucine"></nz-option>
+                  <nz-option nzLabel="OLP Perifusions" nzValue="olp"></nz-option>
+                </nz-select>
+              </div>
+            </nz-tab>
+          </nz-tabset>
+        </nz-tab>
+        
+        <nz-tab nzTitle="Upload List">
+          <!-- Content for Upload List tab -->
+          <div class="tab-content">
+            <p>Upload a list of specific donors:</p>
+            
+            <nz-upload
+              nzType="drag"
+              [nzBeforeUpload]="beforeUpload"
+              [nzShowUploadList]="false"
+              class="upload-area">
+              <p class="ant-upload-drag-icon">
+                <i nz-icon nzType="inbox"></i>
+              </p>
+              <p class="ant-upload-text">Click or drag file to upload</p>
+              <p class="ant-upload-hint">Support for CSV or Excel files</p>
+            </nz-upload>
+          </div>
+        </nz-tab>
+      </nz-tabset>
+    </div>
+    
+    <div class="select-group pvalue-group">
+      <label class="select-label">P-value cutoff:</label>
+      <input
+        type="number"
+        nz-input
+        [(ngModel)]="pValueCutoff"
+        [min]="0"
+        [max]="1"
+        [step]="0.001"
+        class="p-value-input"
+      />
+
+      <div class="checkbox-container">
+        <input type="checkbox" id="green-checkbox" [(ngModel)]="isChecked"/>
+        <label for="green-checkbox" class="custom-checkbox"></label>
+        <span>Use adjusted p-values</span>
+      </div>
+    </div>
+
+    <div class="submit-button-container">
+      <button nz-button nzType="primary" class="submit-btn">
+        Submit
+      </button>
+    </div>
+
+    <div class="pagination-container">
+      <nz-pagination [nzPageIndex]="1" [nzTotal]="50">
+      </nz-pagination>
+    </div>
+
+    <button class="cookies-float-btn" type="button" (click)="onCookiesClick()">
+      <i class="fas fa-cookie-bite"></i>
+      &nbsp;Cookies
+    </button>
+  </nz-content>
+
+  <nz-footer>
+    <app-footer></app-footer>
+  </nz-footer>
+
+</nz-layout>
